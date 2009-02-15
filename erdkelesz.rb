@@ -2,6 +2,10 @@ require 'rubygems'
 require 'sinatra'
 require 'gadget'
 
+get '/' do
+  haml :about
+end
+
 get '/gadget.xml' do
   haml :gadget
 end
