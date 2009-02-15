@@ -17,9 +17,9 @@ set :deploy_via,          :remote_cache
 # We only have one environment now
 #task :production do
   set :domain, 'ruby1-test.dmz.virgo.private'
-  role :web, :domain
-  role :app, :domain
-  role :db , :domain, :primary => true
+  role :web, domain
+  role :app, domain
+  role :db , domain, :primary => true
 
   set :rack_env, "production"
 #end
