@@ -1,0 +1,7 @@
+!!! XML
+%Module
+  %ModulePrefs{Gadget.module_prefs}
+    - Gadget.requires.each do |r|
+      %Require{:feature => r}/
+  = gadget_content_tag do
+    Hello World!
