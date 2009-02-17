@@ -16,4 +16,4 @@ development:
 
 production:
   <<: *defaults
-  appid: 1684885812
+  appid: 1783065652
