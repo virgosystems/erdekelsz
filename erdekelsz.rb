@@ -11,6 +11,7 @@ get '/' do
 end
 
 get '/gadget.xml' do
+  @title = request.query_string
   haml :gadget
 end
 
