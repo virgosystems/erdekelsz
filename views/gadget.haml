@@ -3,4 +3,5 @@
   %ModulePrefs{Gadget.module_prefs}
     - Gadget.requires.each do |r|
       %Require{:feature => r}/
-  = gadget_content_tag :canvas
+  = gadget_content_tag do
+    haml :canvas
