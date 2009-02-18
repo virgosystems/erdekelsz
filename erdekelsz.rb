@@ -3,6 +3,8 @@ require 'sinatra'
 require 'gadget'
 require 'model'
 
+set :raise_errors, true
+set :logging, true
 
 get '/' do
   haml :about
