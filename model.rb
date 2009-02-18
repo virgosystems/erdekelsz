@@ -1,5 +1,4 @@
 require 'dm-core'
-require 'dm-timestamps'
 
 DataMapper.setup(:default, :adapter => :sqlite3, :database => "db/#{Sinatra::Application.environment}.sqlite3")
 
@@ -9,7 +8,6 @@ class Profile
   property :id,           String, :key => true
   property :display_name, String
   property :profile_url,  String
-  property :created_at,   Time
 
   has n, :interests
   has n, :marked_profiles, :through => :interests, :remote_name => :profile,
@@ -23,7 +21,6 @@ class Interest
 
   property :profile_id,       String, :key => true
   property :interested_in_id, String, :key => true
-  property :created_at,       Time
 
   belongs_to :profile, :child_key => [:profile_id]
   belongs_to :interested_in, :child_key => [:interested_in_id], :class_name => "Profile"
