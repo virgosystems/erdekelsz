@@ -15,7 +15,7 @@ get '/gadget.xml' do
 end
 
 get '/test' do
-  "Test"
+  request.host
 end
 
 
