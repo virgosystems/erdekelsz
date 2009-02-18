@@ -11,9 +11,8 @@ $.gadgeteer = function(callback, options) {
     $.gadgeteer.host = options.host || '';
 
     // Setup link behaviours
-    if (options.linkBehaviours) {
-      $.gadgeteer.linkBehaviours = options.linkBehaviours;
-      // All anchor tags will perform an ajax call
+    $.gadgeteer.linkBehaviours = options.linkBehaviours || {};
+    if (!options.noAjaxLinks) {
       $('a').livequery('click', function(e) {
         $.gadgeteer.handleLinkBehaviour.call($(this), e);
       }).removeAttr('onclick');
@@ -29,7 +28,7 @@ $.gadgeteer = function(callback, options) {
         $.ajax({
           url: action.charAt(0) == '/' ? $.gadgeteer.host + action : action,
           type: form.attr('method') || 'GET',
-          data: [$.param(form.formToArray()), $.param($.gadgeteer.viewer.osParams())].join("&"),
+          data: [$.param(form.formToArray()), $.param($.gadgeteer.viewer.osParams()), $.param($.gadgeteer.owner.osParams())].join("&"),
           dataType: 'html',
           auth: 'SIGNED',
           target: target
@@ -61,7 +60,7 @@ $.gadgeteer = function(callback, options) {
         $.ajax({
           url: href.charAt(0) == '/' ? $.gadgeteer.host + href : href,
           type: 'GET',
-          data: $.param($.gadgeteer.viewer.osParams()),
+          data: $.param($.gadgeteer.viewer.osParams()) + '&' + $.param($.gadgeteer.owner.osParams()),
           dataType: 'html',
           auth: settings.auth,
           target: settings.target
@@ -121,15 +120,19 @@ $.extend($.gadgeteer, {
     return $.gadgeteer.LOADING_ELEM = loading;
   },
 
-  simpleRequest: function(href) {
+  simpleRequest: function(href, signed) {
     var params = {}
     if (href.indexOf('os_viewer_id') == -1) params.os_viewer_id = $.gadgeteer.viewer.id;
     if (href.indexOf('os_owner_id') == -1) params.os_owner_id = $.gadgeteer.owner.id;
+    if (signed) {
+      params = $.extend(false, params, $.gadgeteer.viewer.osParams(), $.gadgeteer.owner.osParams());
+    }
     $.ajax({
       type: 'GET',
       data: $.param(params),
       url: href.charAt(0) == '/' ? $.gadgeteer.host + href : href,
       dataType: 'html',
+      auth: signed && 'SIGNED',
       target: $($.gadgeteer.defaultTarget)
     });
   },
@@ -157,7 +160,7 @@ $.extend($.gadgeteer, {
     var method = link.hasClass('post') ? 'post' : link.hasClass('put') ? 'put' : link.hasClass('delete') ? 'delete' : 'get';
     if (method != 'get') params._method = method;
     if (link.hasClass('signed'))
-      params = $.extend(false, params, $.gadgeteer.viewer.osParams());
+      params = $.extend(false, params, $.gadgeteer.viewer.osParams(), $.gadgeteer.owner.osParams());
     else
       params = $.extend(false, params, {os_viewer_id: $.gadgeteer.viewer.id, os_owner_id: $.gadgeteer.owner.id});
 
@@ -186,7 +189,7 @@ $.extend($.gadgeteer, {
       if ($.isFunction(callback) && (match = callback.call(link, e))) {
         var params = match === true ? [] : ($.isFunction(match.push) ? match : Array(match));
         params.push(e);
-        //console.log('calling ', behaviour, ' link behaviour for ', link, ' with ', params);
+        console.log('calling ', behaviour, ' link behaviour for ', link, ' with ', params);
         var handler = behaviour+'Request';
         handler = $.gadgeteer.linkBehaviours.handlers && $.gadgeteer.linkBehaviours.handlers[handler] || $.gadgeteer[handler];
         handler.apply(link, params);
@@ -196,7 +199,7 @@ $.extend($.gadgeteer, {
     });
     if (!matched) {
      var def = $.gadgeteer.linkBehaviours.defaultBehavior || 'ajax';
-     //console.log('calling DEFAULT ', def, ' link behaviour for ', link, ' with ', e);
+     console.log('calling DEFAULT ', def, ' link behaviour for ', link, ' with ', e);
      $.gadgeteer[def+'Request'].call(link, e);
     }
   }

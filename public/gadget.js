@@ -3,7 +3,7 @@ var app = {
 
   init: function() {
     console.log('app init');
-    $.gadgeteer.simpleRequest('/test');
+    $.gadgeteer.simpleRequest('/profiles/'+$.gadgeteer.owner.id, true);
   }
 }
 

@@ -1,0 +1,7 @@
+%h1 Jó vadászatot!
+
+%pre
+  == os_viewer: #{os_viewer.inspect.gsub(/[<>]/, '|')}
+  == viewer: #{@viewer.inspect.gsub(/[<>]/, '|')}
+  == new_record?: #{@viewer.new_record?.inspect}
+  == attributes: #{@viewer.attributes.inspect}

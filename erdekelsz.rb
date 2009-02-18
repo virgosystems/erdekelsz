@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'sinatra'
+require 'sinatra/gadgeteer'
 require 'gadget'
 require 'model'
 
@@ -16,9 +17,26 @@ get '/gadget.xml' do
 end
 
 get '/test' do
-  request.host
+  params.inspect
 end
 
+get %r{/profiles/(.*)} do
+  if os_viewer[:id] == os_owner[:id]
+    @viewer = Profile.get(os_viewer[:id]) || Profile.new(:id => os_viewer[:id])
+    @viewer.update_attributes(os_viewer, *@viewer.attributes.keys)
+    haml :profile
+  else
+    haml :interest
+  end
+end
+
+post %r{/profiles/(.*)} do
+  params[:captures].first.inspect
+end
+
+get %r{/profiles/(.*)} do
+  params[:captures].first.inspect
+end
 
 helpers do
   def gadget_content_tag(view = nil, &block)
