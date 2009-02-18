@@ -1,7 +1,12 @@
 $.gadgeteer = function(callback, options) {
   // If called with callback, notify it if we're ready
   if ($.isFunction(callback)) {
-    options = options || {};
+    if ($.gadgeteer.options) {
+      return false;
+    } else {
+      $.gadgeteer.options = options = options || {};
+    }
+    console.log('called $.gadgeteer() with callback');
     $.gadgeteer.defaultTarget = options.defaultTarget || '#page';
     $.gadgeteer.host = options.host || '';
 
@@ -32,6 +37,38 @@ $.gadgeteer = function(callback, options) {
       });
     }
 
+    // Setup ajax event callbacks
+    $(document).ajaxSend(function(e, request, settings) {
+      if (settings.target) {
+        // TODO: make this customizable by `loading` callback in options
+        $(settings.target).append($.gadgeteer.loadingElem());
+      }
+    }).ajaxSuccess(function(e, request, settings) {
+      $.gadgeteer.currentUrl = request.url;
+      if (settings.target) {
+        var html = request.responseText;
+        $(settings.target).html(html);
+      }
+      // !iframe
+      $(window).adjustHeight();
+      // Do another adjustHeight in 250ms just to be sure
+      setTimeout(function() {$(window).adjustHeight();}, 250);
+    }).ajaxComplete(function(e, request, settings) {
+      if (request.status.toString().charAt(0) == '3') {
+        var href = request.getResponseHeader('Location') || request.getResponseHeader('location');
+        // hackish way to determine if we have an array (depends on the fact that the real href must be longer than 1 char)
+        if (!href.charAt) href = href[0];
+        $.ajax({
+          url: href.charAt(0) == '/' ? $.gadgeteer.host + href : href,
+          type: 'GET',
+          data: $.param($.gadgeteer.viewer.osParams()),
+          dataType: 'html',
+          auth: settings.auth,
+          target: settings.target
+        });
+      }
+    });
+
     // Wait for everything to load then call the callback
     setTimeout(function() {
       if ($.gadgeteer.viewer && $.gadgeteer.owner) {
@@ -48,6 +85,7 @@ $.gadgeteer = function(callback, options) {
     }, 50);
 
   } else { // if called with no arguments it means we're initializing
+    console.log('called $.gadgeteer() without callback');
     // Get information about the viewer and owner
     $.getData('/people/@viewer/@self', function(data, status) {
       $.gadgeteer.viewer = data[0];
@@ -70,6 +108,17 @@ $.extend($.gadgeteer, {
       }
     }
     return params;
+  },
+
+  loadingElem: function() {
+    if ($.gadgeteer.LOADING_ELEM) return $.gadgeteer.LOADING_ELEM;
+
+    // TODO: make this customizable
+    var loading = $('#loading');
+    if (loading.length < 1) {
+      loading = $('<div id="loading">Az oldal tölt <span class="ellipses">…</span></div>');
+    }
+    return $.gadgeteer.LOADING_ELEM = loading;
   },
 
   simpleRequest: function(href) {
@@ -156,4 +205,4 @@ $.extend($.gadgeteer, {
 
 
 // Initialize gadgeteer
-$($.gadgeteer)
+$($.gadgeteer);
