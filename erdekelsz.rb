@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'sinatra'
 require 'gadget'
+require 'model'
+
 
 get '/' do
   haml :about
@@ -9,6 +11,11 @@ end
 get '/gadget.xml' do
   haml :gadget
 end
+
+get '/test' do
+  "Test"
+end
+
 
 helpers do
   def gadget_content_tag(view = nil, &block)
