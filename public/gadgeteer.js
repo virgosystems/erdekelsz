@@ -6,7 +6,6 @@ $.gadgeteer = function(callback, options) {
     } else {
       $.gadgeteer.options = options = options || {};
     }
-    console.log('called $.gadgeteer() with callback');
     $.gadgeteer.defaultTarget = options.defaultTarget || '#page';
     $.gadgeteer.host = options.host || '';
 
@@ -84,7 +83,6 @@ $.gadgeteer = function(callback, options) {
     }, 50);
 
   } else { // if called with no arguments it means we're initializing
-    console.log('called $.gadgeteer() without callback');
     // Get information about the viewer and owner
     $.getData('/people/@viewer/@self', function(data, status) {
       $.gadgeteer.viewer = data[0];
@@ -189,7 +187,7 @@ $.extend($.gadgeteer, {
       if ($.isFunction(callback) && (match = callback.call(link, e))) {
         var params = match === true ? [] : ($.isFunction(match.push) ? match : Array(match));
         params.push(e);
-        console.log('calling ', behaviour, ' link behaviour for ', link, ' with ', params);
+        //console.log('calling ', behaviour, ' link behaviour for ', link, ' with ', params);
         var handler = behaviour+'Request';
         handler = $.gadgeteer.linkBehaviours.handlers && $.gadgeteer.linkBehaviours.handlers[handler] || $.gadgeteer[handler];
         handler.apply(link, params);
@@ -199,7 +197,7 @@ $.extend($.gadgeteer, {
     });
     if (!matched) {
      var def = $.gadgeteer.linkBehaviours.defaultBehavior || 'ajax';
-     console.log('calling DEFAULT ', def, ' link behaviour for ', link, ' with ', e);
+     //console.log('calling DEFAULT ', def, ' link behaviour for ', link, ' with ', e);
      $.gadgeteer[def+'Request'].call(link, e);
     }
   }
