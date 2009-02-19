@@ -51,6 +51,16 @@ $.gadgeteer = function(callback, options) {
       $(window).adjustHeight();
       // Do another adjustHeight in 250ms just to be sure
       setTimeout(function() {$(window).adjustHeight();}, 250);
+    }).ajaxError(function(e, request, settings, exception) {
+      console.log(request, settings, exception);
+      if (settings.target) {
+        var html = request.responseText;
+        $(settings.target).html(html);
+      }
+      // !iframe
+      $(window).adjustHeight();
+      // Do another adjustHeight in 250ms just to be sure
+      setTimeout(function() {$(window).adjustHeight();}, 250);
     }).ajaxComplete(function(e, request, settings) {
       if (request.status.toString().charAt(0) == '3') {
         var href = request.getResponseHeader('Location') || request.getResponseHeader('location');

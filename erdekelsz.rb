@@ -20,7 +20,15 @@ get %r{/test/(.*)} do
   request.path_info.inspect
 end
 
-get %r{/profiles/(.*)} do
+profile_path = %r{^/profiles/(.*)}
+
+before do
+  if request.path_info =~ profile_path and not verify_signature
+    halt(401, "oops!")
+  end
+end
+
+get profile_path do
   if os_viewer[:id] == os_owner[:id]
     @viewer = Profile.get(os_viewer[:id]) || Profile.new(:id => os_viewer[:id])
     @viewer.update_attributes(os_viewer, *@viewer.attributes.keys)
@@ -32,14 +40,14 @@ get %r{/profiles/(.*)} do
   end
 end
 
-post %r{/profiles/(.*)} do
+post profile_path do
   @viewer = Profile.get(os_viewer[:id])
   @owner  = Profile.get(os_owner[:id])
   @viewer.interests.create :interested_in => @owner
   redirect request.path_info
 end
 
-delete %r{/profiles/(.*)} do
+delete profile_path do
   @viewer = Profile.get(os_viewer[:id])
   @owner  = Profile.get(os_owner[:id])
   @viewer.interests.first(:interested_in_id => @owner.id).destroy

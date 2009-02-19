@@ -25,8 +25,12 @@ module Gadgeteer
         cattr_accessor :public_keys, :oauth_secrets
       end
     end
-    base.helper_method :open_social if base.respond_to?(:helper_method)
+    if base.respond_to?(:helper_method)
+      base.helper_method :open_social, :os_viewer, :os_owner
+    end
   end
+
+  class SecretMissingError < StandardError; end
 
   protected
     def public_key(key)
@@ -37,23 +41,27 @@ module Gadgeteer
       @@oauth_secrets[key || :default]
     end
 
-    def verify_signature
-      secret = if params[:xoauth_signature_publickey]
-        public_key(params[:xoauth_signature_publickey])
+    def verify_signature!
+      secret = if key = params[:xoauth_signature_publickey]
+        public_key(key) ||
+          raise(SecretMissingError, "Missing public key for #{key}")
       else
-        oauth_secret(params[:oauth_consumer_key])
+        key = params[:oauth_consumer_key]
+        oauth_secret(key) ||
+          raise(SecretMissingError, "Missing oauth secret for #{key}")
       end
-      consumer = OAuth::Consumer.new(params[:oauth_consumer_key], secret)
 
-      begin
-        signature = OAuth::Signature.build(request) do
-          # return the token secret and the consumer secret
-          [nil, consumer.secret]
-        end
-        pass = signature.verify
-      rescue OAuth::Signature::UnknownSignatureMethod => e
-        logger.error "ERROR #{e}"
+      signature = OAuth::Signature.build(request) do
+        # return the token secret and the consumer secret
+        [nil, secret]
       end
+      pass = signature.verify
+    end
+
+    def verify_signature
+      verify_signature!
+    rescue OAuth::Signature::UnknownSignatureMethod, SecretMissingError
+      false
     end
 
     def open_social
