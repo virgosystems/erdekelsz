@@ -32,6 +32,9 @@ get profile_path do
   if os_viewer[:id] == os_owner[:id]
     @viewer = Profile.get(os_viewer[:id]) || Profile.new(:id => os_viewer[:id])
     @viewer.update_attributes(os_viewer, *@viewer.attributes.keys)
+    @matches, @marked = @viewer.marked_profiles.partition do |p|
+      @viewer.marked_by.include?(p)
+    end
     haml :profile
   else
     @viewer = Profile.get(os_viewer[:id])
@@ -52,4 +55,10 @@ delete profile_path do
   @owner  = Profile.get(os_owner[:id])
   @viewer.interests.first(:interested_in_id => @owner.id).destroy
   redirect request.path_info
+end
+
+helpers do
+  def profile_link(p)
+    %{<a href="/profile/#{p.id}">#{p.display_name}</a>}
+  end
 end

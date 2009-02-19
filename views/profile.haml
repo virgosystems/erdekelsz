@@ -1,7 +1,17 @@
 %h1 Jó vadászatot!
 
-%pre
-  == os_viewer: #{os_viewer.inspect.gsub(/[<>]/, '|')}
-  == viewer: #{@viewer.inspect.gsub(/[<>]/, '|')}
-  == new_record?: #{@viewer.new_record?.inspect}
-  == attributes: #{@viewer.attributes.inspect}
+%h2 Akik iránt eddig érdeklődsz
+- if @marked.empty?
+  Senki
+- else
+  %ul
+    - @marked.each do |p|
+      %li= profile_link(p)
+
+%h2 Akiket viszont érdekelsz
+- if @matches.empty?
+  Senki
+- else
+  %ul
+    - @matches.each do |p|
+      %li= profile_link(p)
