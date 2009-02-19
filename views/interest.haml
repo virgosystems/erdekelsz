@@ -1,1 +1,6 @@
-GOMBOK
+- marked = @viewer.marked_profiles.include?(@owner)
+%a{:href => "/profiles/#{os_owner[:id]}", :class => "signed #{marked ? 'delete' : 'post'}"}
+  = marked ? "Mégsem érdekel" : "Érdekel"
+
+- if marked and @viewer.marked_by.include?(@owner)
+  %h1.match ❤ ❤ ❤

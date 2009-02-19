@@ -16,8 +16,8 @@ get '/gadget.xml' do
   haml :gadget
 end
 
-get '/test' do
-  params.inspect
+get %r{/test/(.*)} do
+  request.path_info.inspect
 end
 
 get %r{/profiles/(.*)} do
@@ -26,16 +26,24 @@ get %r{/profiles/(.*)} do
     @viewer.update_attributes(os_viewer, *@viewer.attributes.keys)
     haml :profile
   else
+    @viewer = Profile.get(os_viewer[:id])
+    @owner  = Profile.get(os_owner[:id])
     haml :interest
   end
 end
 
 post %r{/profiles/(.*)} do
-  params[:captures].first.inspect
+  @viewer = Profile.get(os_viewer[:id])
+  @owner  = Profile.get(os_owner[:id])
+  @viewer.interests.create :interested_in => @owner
+  redirect request.path_info
 end
 
-get %r{/profiles/(.*)} do
-  params[:captures].first.inspect
+delete %r{/profiles/(.*)} do
+  @viewer = Profile.get(os_viewer[:id])
+  @owner  = Profile.get(os_owner[:id])
+  @viewer.interests.first(:interested_in_id => @owner.id).destroy
+  redirect request.path_info
 end
 
 helpers do

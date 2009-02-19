@@ -10,9 +10,11 @@ class Profile
   property :profile_url,  String
 
   has n, :interests
-  has n, :marked_profiles, :through => :interests, :remote_name => :profile,
+  has n, :marked_profiles, :through => :interests,
+         :remote_name => :interested_in,
          :class_name => "Profile", :child_key => [:profile_id]
-  has n, :marked_by, :through => :interests, :remote_name => :interested_in,
+  has n, :marked_by, :through => :interests,
+         :remote_name => :profile,
          :class_name => "Profile", :child_key => [:interested_in_id]
 end
 
