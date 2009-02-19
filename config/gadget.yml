@@ -1,8 +1,8 @@
 defaults: &defaults
   module_prefs:
-    title: Érdekelsz
+    title: "Érdekelsz"
     author: "Bácsi László, Salomváry Márton"
-    author_email: bacsi.laszlo@virgo.hu
+    author_email: "bacsi.laszlo@virgo.hu"
   requires:
     - opensocial-0.8
     - dynamic-height
@@ -13,6 +13,10 @@ defaults: &defaults
 development:
   <<: *defaults
   appid: 1684885812
+
+test:
+  <<: *defaults
+  appid: 1234567890
 
 production:
   <<: *defaults
