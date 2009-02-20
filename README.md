@@ -11,21 +11,8 @@ Az alkalmazás a [Sinatra](http://www.sinatrarb.com/) rubys webframeworköt és 
 
 A fejlesztés a Gadgeteer gemmel a következő lépésekből áll:
 
-* saját app layout kialakítása
-
-@@@ shell
-$ rails my_gadget           # Rails alkalmazás
-$ echo "require 'sinatra'"  # Sinatra alkalmazás :)
-@@@
-
-* gadgeteer generátor futattása
-
-@@@ shell
-$ # az alkalmazás könyvtárában
-$ gadgeteer --rails Gadget    # Rails
-$ gadgeteer --sinatra Gadget  # Sinatra
-@@@
-
+* saját app layout kialakítása (`$ rails my_gadget` v. `$ echo "require 'sinatra'"`)
+* gadgeteer generátor futattása (az alkalmazás könyvtárában: `$ gadgeteer --rails Gadget` v. `$ gadgeteer --sinatra Gadget`)
 * `config/gadget.yml` szerkesztése (saját app title, author és email)
 * model, controller és view rétegek megírása
 * ...
@@ -41,9 +28,7 @@ Az [Interest](v0.1/model.rb#L21-29) modell pedig a kapcsolótábla az érdeklőd
 
 A `Profile` modell a kapcsolatok ellenőrzésére még két `has n :through` relációt is bevezet. Ezzel az, hogy az owner bejelölte-e az aktuális viewer felhasználót ílyen egyszerű ellenőrzéssé válik:
 
-@@@ ruby
-@viewer.marked_profiles.include?(@owner)
-@@@
+    @viewer.marked_profiles.include?(@owner)
 
 A modellek definiálása után lövünk egy `auto_upgrade!`-et, hogy az alkalmazás indulásakor biztosan szinkronba kerüljön az adatbázis a modellünkkel.
 
@@ -63,9 +48,7 @@ A lényeg, és ami alig lehetne egyszerűbb. Erről is írok majd még. :)
 
 Ha kísérletezgetni akarsz nyugodtan használd ezt a repositoryt alapul. Forkold GitHub-on, vagy töltsd le és kísérletezgess vele. Ehhez az alábbi dolgok kellenek:
 
-@@@ shell
-$ gem install sinatra dm-core do_sqlite3
-$ gem install gadgeteer --source http://ruby.virgo.hu/gems/
-@@@
+    $ gem install sinatra dm-core do_sqlite3
+    $ gem install gadgeteer --source http://ruby.virgo.hu/gems/
 
 (c) Copyright 2009 Virgo Systems Kft., released under the MIT license
